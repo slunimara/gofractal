@@ -40,6 +40,5 @@ func (p Point) Add(other Point) {
 
 // AddXY adds the given x and y coordinates to the current point.
 func (p Point) AddXY(x, y uint64) {
-	p.x += x
-	p.y += y
+	p.Add(NewPoint(x, y))
 }
