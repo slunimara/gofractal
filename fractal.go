@@ -6,14 +6,14 @@ import (
 	"math/cmplx"
 )
 
-func is_stable(c complex128, max_iterations int) bool {
-	z := complex(0, 0)
+func Is_stable(c complex128, max_iterations int) bool {
+	z := 0 + 0i
 	i := 1
 	for i <= max_iterations {
 		z = cmplx.Pow(z, 2) + c
 		i += 1
 	}
-	return cmplx.Abs(c) <= 2
+	return cmplx.Abs(z) <= 2
 }
 
 func Mandelbrot() {
@@ -31,8 +31,9 @@ func Mandelbrot() {
 		for _, re := range xRange {
 			c := complex(re, im)
 
-			if is_stable(c, max_iterations) {
+			if Is_stable(c, max_iterations) {
 				canvas.DrawNextPixel(color.Black)
+
 			} else {
 				canvas.DrawNextPixel(color.White)
 			}
@@ -44,7 +45,7 @@ func Mandelbrot() {
 
 // Neefektivní! Step musí být > 0 !!
 func arange(start, stop, step float64) []float64 {
-	N := int(math.Ceil((math.Abs(stop-start))/step)) + 1
+	N := int(math.Ceil((math.Abs(stop - start)) / step))
 	arr := make([]float64, N)
 
 	if start > stop {
