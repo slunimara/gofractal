@@ -7,16 +7,16 @@ import (
 )
 
 // TODO: Documenation
-func is_stable(c complex128, maxIterations int) bool {
-	i := 0
-	z := 0 + 0i
+func isStable(c complex128, maxIterations uint) (bool, uint) {
+	z := complex(0, 0)
+	i := uint(0)
 
 	for i < maxIterations {
 		z = cmplx.Pow(z, 2) + c
-		i++
+		i += 1
 	}
 
-	return cmplx.Abs(z) <= 2
+	return cmplx.Abs(z) <= 2, i
 }
 
 // TODO: Documenation
@@ -31,8 +31,9 @@ func Mandelbrot(canvas *Canvas, maxIterations int, density float64) {
 	for _, im := range yRange {
 		for _, re := range xRange {
 			c := complex(re, im)
+			stable, _ := isStable(c, uint(maxIterations))
 
-			if is_stable(c, maxIterations) {
+			if stable {
 				canvas.DrawNextPixel(color.Black)
 			} else {
 				canvas.DrawNextPixel(color.White)
