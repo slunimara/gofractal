@@ -39,7 +39,7 @@ func (c *Canvas) NextPixel() {
 	}
 
 	if c.lastPixel.Y() == c.Height()+1 {
-		c.lastPixel = NewPoint(1, 1)
+		c.SetLastPixel(NewPoint(1, 1))
 	}
 }
 
