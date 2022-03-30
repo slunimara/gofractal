@@ -1,5 +1,9 @@
 package gofractal
 
+var (
+	PointZero = NewPoint(0, 0)
+)
+
 type Point struct {
 	x, y uint64
 }
