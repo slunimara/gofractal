@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/slunimara/gofractal"
 )
@@ -9,8 +10,14 @@ import (
 func main() {
 	fmt.Println("--- Mandelbrot Set ---")
 
-	canvas := gofractal.NewCanvas(250, 200)
-	gofractal.Mandelbrot(canvas, 10, 0.01)
+	canvas := gofractal.NewCanvas(25000, 20000)
+
+	tStart := time.Now()
+	gofractal.Mandelbrot(canvas, 1000, 0.0001)
+	tEnd := time.Now()
+
+	fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
+
 	canvas.Save("mandelbrot.png")
 
 	fmt.Println("--- Done ---")
