@@ -31,11 +31,11 @@ func (c Canvas) Height() uint64 {
 
 // NextPixel increments the current pixel position.
 func (c *Canvas) NextPixel() {
-	c.lastPixel.AddXY(1, 0)
+	c.lastPixel.AddX(1)
 
 	if c.lastPixel.X() == c.Width()+1 {
 		c.lastPixel.SetX(1)
-		c.lastPixel.AddXY(0, 1)
+		c.lastPixel.AddY(1)
 	}
 
 	if c.lastPixel.Y() == c.Height()+1 {
