@@ -46,3 +46,13 @@ func (p *Point) Add(other Point) {
 func (p *Point) AddXY(x, y uint64) {
 	p.Add(NewPoint(x, y))
 }
+
+// AddX adds the given x coordinate to the current point.
+func (p Point) AddX(x uint64) {
+	p.Add(NewPoint(x, 0))
+}
+
+// AddY adds the given y coordinate to the current point.
+func (p Point) AddY(y uint64) {
+	p.Add(NewPoint(0, y))
+}
