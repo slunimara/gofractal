@@ -7,8 +7,11 @@ import (
 )
 
 func main() {
-	fmt.Print("--- Mandelbrot Set ---\n")
-	gofractal.Mandelbrot()
+	fmt.Println("--- Mandelbrot Set ---")
 
-	fmt.Print("\n--- Done ---")
+	canvas := gofractal.NewCanvas(250, 200)
+	gofractal.Mandelbrot(canvas, 10, 0.01)
+	canvas.Save("mandelbrot.png")
+
+	fmt.Println("--- Done ---")
 }

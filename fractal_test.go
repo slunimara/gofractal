@@ -17,6 +17,7 @@ func TestIsStable(t *testing.T) {
 
 	for _, table := range tables {
 		result := is_stable(table.c, numberInterations)
+
 		if result != table.r {
 			t.Errorf("Function absc was incorrect, got: %t, want: %t.", result, table.r)
 		}
@@ -48,5 +49,7 @@ func TestArange(t *testing.T) {
 }
 
 func TestMandelbrot(t *testing.T) {
-	Mandelbrot()
+	canvas := NewCanvas(250, 200)
+
+	Mandelbrot(canvas, 10, 0.01)
 }
