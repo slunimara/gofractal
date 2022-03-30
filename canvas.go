@@ -1,6 +1,7 @@
 package gofractal
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/fogleman/gg"
@@ -41,6 +42,8 @@ func (c *Canvas) NextPixel() {
 	if c.lastPixel.Y() == c.Height() {
 		c.SetLastPixel(PointZero)
 	}
+
+	fmt.Println(c.lastPixel)
 }
 
 // SetLastPixel sets the current pixel position.
@@ -74,6 +77,6 @@ func (c *Canvas) Clear() {
 }
 
 // Save saves the canvas to the given file.
-func (c *Canvas) Save(filename string) error {
+func (c Canvas) Save(filename string) error {
 	return c.ctx.SavePNG(filename)
 }
