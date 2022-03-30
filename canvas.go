@@ -15,7 +15,7 @@ type Canvas struct {
 func NewCanvas(width, height uint64) *Canvas {
 	return &Canvas{
 		ctx:       gg.NewContext(int(width), int(height)),
-		lastPixel: NewPoint(1, 1),
+		lastPixel: PointZero,
 	}
 }
 
@@ -33,13 +33,13 @@ func (c Canvas) Height() uint64 {
 func (c *Canvas) NextPixel() {
 	c.lastPixel.AddXY(1, 0)
 
-	if c.lastPixel.X() == c.Width()+1 {
+	if c.lastPixel.X() == c.Width() {
 		c.lastPixel.SetX(1)
 		c.lastPixel.AddXY(0, 1)
 	}
 
-	if c.lastPixel.Y() == c.Height()+1 {
-		c.SetLastPixel(NewPoint(1, 1))
+	if c.lastPixel.Y() == c.Height() {
+		c.SetLastPixel(PointZero)
 	}
 }
 
@@ -50,8 +50,8 @@ func (c *Canvas) SetLastPixel(p Point) {
 
 // DrawNextPixel draws the next pixel in the current direction.
 func (c *Canvas) DrawNextPixel(color color.Color) {
-	c.NextPixel()
 	c.DrawPixel(color)
+	c.NextPixel()
 }
 
 // DrawPixel draws a pixel at the current position.
