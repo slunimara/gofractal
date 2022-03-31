@@ -30,32 +30,39 @@ func Mandelbrot(canvas *Canvas, maxIterations int, density float64) {
 	yRange := arange(imag(view.tr), imag(view.bl), density)
 
 	var mutex sync.Mutex
-	var waitGroup sync.WaitGroup
+	waitGroup := NewWaitGroup()
 
 	for y, im := range yRange {
+
+		for waitGroup.Length() >= 64 {
+			continue
+		}
 
 		waitGroup.Add(1)
 
 		go func(y int, im float64) {
 			defer waitGroup.Done()
 
+			stableArray := make([]bool, len(xRange))
+
 			for x, re := range xRange {
 				c := complex(re, im)
 
-				if is_stable(c, maxIterations) {
-					mutex.Lock()
-
-					canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
-
-					mutex.Unlock()
-				} else {
-					mutex.Lock()
-
-					canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
-
-					mutex.Unlock()
-				}
+				stableArray[x] = is_stable(c, maxIterations)
 			}
+
+			mutex.Lock()
+			for x, stable := range stableArray {
+
+				if stable {
+					canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
+				} else {
+					canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
+				}
+
+			}
+			mutex.Unlock()
+
 		}(y, im)
 	}
 

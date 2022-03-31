@@ -10,10 +10,10 @@ import (
 func main() {
 	fmt.Println("--- Mandelbrot Set ---")
 
-	canvas := gofractal.NewCanvas(25000, 20000)
+	canvas := gofractal.NewCanvas(2500, 2000)
 
 	tStart := time.Now()
-	gofractal.Mandelbrot(canvas, 1000, 0.0001)
+	gofractal.Mandelbrot(canvas, 1000, 0.001)
 	tEnd := time.Now()
 
 	fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
