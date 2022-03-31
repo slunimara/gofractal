@@ -8,16 +8,16 @@ import (
 )
 
 // TODO: Documenation
-func is_stable(c complex128, maxIterations int) bool {
-	i := 1
-	z := 0 + 0i
+func isStable(c complex128, maxIterations uint) (bool, uint) {
+	z := complex(0, 0)
+	i := uint(0)
 
 	for i <= maxIterations {
 		z = cmplx.Pow(z, 2) + c
-		i++
+		i += 1
 	}
 
-	return cmplx.Abs(z) <= 2
+	return cmplx.Abs(z) <= 2, i
 }
 
 // TODO: Documenation
