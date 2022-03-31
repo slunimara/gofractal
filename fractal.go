@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"math"
 	"math/cmplx"
+	"sync"
 )
 
 // TODO: Documenation
@@ -11,7 +12,7 @@ func isStable(c complex128, maxIterations uint) (bool, uint) {
 	z := complex(0, 0)
 	i := uint(0)
 
-	for i < maxIterations {
+	for i <= maxIterations {
 		z = cmplx.Pow(z, 2) + c
 		i += 1
 	}
@@ -28,18 +29,44 @@ func Mandelbrot(canvas *Canvas, maxIterations int, density float64) {
 	xRange := arange(real(view.bl), real(view.tr), density)
 	yRange := arange(imag(view.tr), imag(view.bl), density)
 
-	for _, im := range yRange {
-		for _, re := range xRange {
-			c := complex(re, im)
-			stable, _ := isStable(c, uint(maxIterations))
+	var mutex sync.Mutex
+	waitGroup := NewWaitGroup()
 
-			if stable {
-				canvas.DrawNextPixel(color.Black)
-			} else {
-				canvas.DrawNextPixel(color.White)
-			}
+	for y, im := range yRange {
+
+		for waitGroup.Length() >= 64 {
+			continue
 		}
+
+		waitGroup.Add(1)
+
+		go func(y int, im float64) {
+			defer waitGroup.Done()
+
+			stableArray := make([]bool, len(xRange))
+
+			for x, re := range xRange {
+				c := complex(re, im)
+
+				stableArray[x] = is_stable(c, maxIterations)
+			}
+
+			mutex.Lock()
+			for x, stable := range stableArray {
+
+				if stable {
+					canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
+				} else {
+					canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
+				}
+
+			}
+			mutex.Unlock()
+
+		}(y, im)
 	}
+
+	waitGroup.Wait()
 }
 
 // TODO: Documenation
