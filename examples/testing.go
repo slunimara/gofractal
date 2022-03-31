@@ -10,6 +10,12 @@ import (
 func main() {
 	fmt.Println("--- Mandelbrot Set ---")
 
+	mandelbrot()
+
+	fmt.Println("--- Done ---")
+}
+
+func mandelbrot() {
 	canvas := gofractal.NewCanvas(2500, 2000)
 
 	tStart := time.Now()
@@ -17,8 +23,21 @@ func main() {
 	tEnd := time.Now()
 
 	fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
-
 	canvas.Save("mandelbrot.png")
+}
 
-	fmt.Println("--- Done ---")
+func performanceTesting() {
+	fmt.Println("--- Time testing")
+
+	// c := 528649457 + 38573538347i
+
+	// tStart := time.Now()
+	// cmplx.Abs(c)
+	// tEnd := time.Now()
+	// fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
+
+	// tStart = time.Now()
+	// gofractal.CAbs(c)
+	// tEnd = time.Now()
+	// fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
 }

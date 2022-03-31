@@ -1,6 +1,8 @@
 package gofractal
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestIsStable(t *testing.T) {
 	numberInterations := uint(10)

@@ -3,7 +3,6 @@ package gofractal
 import (
 	"image/color"
 	"math"
-	"math/cmplx"
 	"sync"
 )
 
@@ -12,12 +11,12 @@ func isStable(c complex128, maxIterations uint) (bool, uint) {
 	z := complex(0, 0)
 	i := uint(0)
 
-	for i <= maxIterations {
-		z = cmplx.Pow(z, 2) + c
+	for i <= maxIterations && cAbs(z) <= 2 {
+		z = cPow(z) + c
 		i += 1
 	}
 
-	return cmplx.Abs(z) <= 2, i
+	return cAbs(z) <= 2, i
 }
 
 // TODO: Documenation
@@ -47,8 +46,8 @@ func Mandelbrot(canvas *Canvas, maxIterations int, density float64) {
 
 			for x, re := range xRange {
 				c := complex(re, im)
-
-				stableArray[x] = is_stable(c, maxIterations)
+				stable, _ := isStable(c, uint(maxIterations))
+				stableArray[x] = stable
 			}
 
 			mutex.Lock()
