@@ -4,30 +4,6 @@ import (
 	"testing"
 )
 
-func TestIsStable(t *testing.T) {
-	numberInterations := uint(10)
-
-	tables := []struct {
-		c complex128
-		r bool
-	}{
-		{complex(1, 0), false},
-		{complex(0, 0), true},
-		{complex(-2, 3), false},
-		{complex(-0.5, -0.5), true},
-		{complex(0.5, 0.5), false},
-		{complex(-2, 1), false},
-	}
-
-	for _, table := range tables {
-		result, _ := isStable(table.c, 0+0i, numberInterations)
-
-		if result != table.r {
-			t.Errorf("Function absc was incorrect, with value %g, got: %t, want: %t.", table.c, result, table.r)
-		}
-	}
-}
-
 func TestArange(t *testing.T) {
 	tables := []struct {
 		start float64
@@ -50,10 +26,4 @@ func TestArange(t *testing.T) {
 			}
 		}
 	}
-}
-
-func TestMandelbrot(t *testing.T) {
-	canvas := NewCanvas(250, 200)
-
-	Mandelbrot(canvas, 10, 0.01)
 }

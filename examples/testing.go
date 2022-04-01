@@ -17,9 +17,10 @@ func main() {
 
 func mandelbrot() {
 	canvas := gofractal.NewCanvas(2500, 2000)
+	mandelbrot := gofractal.NewMandelbrot(1000, 0.001)
 
 	tStart := time.Now()
-	gofractal.Mandelbrot(canvas, 1000, 0.001)
+	mandelbrot.Draw(canvas)
 	tEnd := time.Now()
 
 	fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
