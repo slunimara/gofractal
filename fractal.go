@@ -7,16 +7,15 @@ import (
 )
 
 // TODO: Documenation
-func isStable(c complex128, maxIterations uint) (bool, uint) {
-	z := complex(0, 0)
+func isStable(c complex128, z complex128, maxIterations uint) (bool, uint) {
 	i := uint(0)
 
-	for i <= maxIterations && cAbs(z) <= 2 {
-		z = cPow(z) + c
+	for i <= maxIterations && complexAbs(z) <= 2 {
+		z = complexPow2(z) + c
 		i += 1
 	}
 
-	return cAbs(z) <= 2, i
+	return complexAbs(z) <= 2, i
 }
 
 // TODO: Documenation
@@ -46,7 +45,8 @@ func Mandelbrot(canvas *Canvas, maxIterations int, density float64) {
 
 			for x, re := range xRange {
 				c := complex(re, im)
-				stable, _ := isStable(c, uint(maxIterations))
+				stable, _ := isStable(c, complex(0, 0), uint(maxIterations))
+				//stable, _ := isStable(0.25+0i, c, uint(maxIterations))
 				stableArray[x] = stable
 			}
 

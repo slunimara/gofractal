@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCPow(t *testing.T) {
+func TestComplexPow2(t *testing.T) {
 	tables := []struct {
 		c complex128
 		v complex128
@@ -17,15 +17,15 @@ func TestCPow(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		result := cPow(table.c)
+		result := complexPow2(table.c)
 
 		if result != table.v {
-			t.Errorf("Function cPow was incorrect, with value %g, got: %g, want: %g.", table.c, result, table.v)
+			t.Errorf("Function complexPow2 was incorrect, with value %g, got: %g, want: %g.", table.c, result, table.v)
 		}
 	}
 }
 
-func TestCAbs(t *testing.T) {
+func TestComplexAbs(t *testing.T) {
 	tables := []struct {
 		c complex128
 		v uint
@@ -37,10 +37,10 @@ func TestCAbs(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		result := cAbs(table.c)
+		result := complexAbs(table.c)
 
 		if result != table.v {
-			t.Errorf("Function cAbs was incorrect, with value %g, got: %d, want: %d.", table.c, result, table.v)
+			t.Errorf("Function complexAbs was incorrect, with value %g, got: %d, want: %d.", table.c, result, table.v)
 		}
 	}
 }

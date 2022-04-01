@@ -20,7 +20,7 @@ func TestIsStable(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		result, _ := isStable(table.c, numberInterations)
+		result, _ := isStable(table.c, 0+0i, numberInterations)
 
 		if result != table.r {
 			t.Errorf("Function absc was incorrect, with value %g, got: %t, want: %t.", table.c, result, table.r)
