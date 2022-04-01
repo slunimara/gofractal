@@ -7,15 +7,15 @@ import (
 )
 
 type Canvas struct {
-	ctx       *gg.Context
-	lastPixel Point
+	ctx          *gg.Context
+	currentPixel Pixel
 }
 
 // NewCanvas returns a new canvas with the given width and height.
 func NewCanvas(width, height uint64) *Canvas {
 	return &Canvas{
-		ctx:       gg.NewContext(int(width), int(height)),
-		lastPixel: PointZero,
+		ctx:          gg.NewContext(int(width), int(height)),
+		currentPixel: PixelZero(),
 	}
 }
 
@@ -31,25 +31,25 @@ func (c Canvas) Height() uint64 {
 
 // NextPixel increments the current pixel position.
 func (c *Canvas) NextPixel() {
-	c.lastPixel.AddX(1)
+	c.currentPixel.AddX(1)
 
-	if c.lastPixel.X() == c.Width() {
-		c.lastPixel.SetX(0)
-		c.lastPixel.AddY(1)
+	if c.currentPixel.X() == c.Width() {
+		c.currentPixel.SetX(0)
+		c.currentPixel.AddY(1)
 	}
 
-	if c.lastPixel.Y() == c.Height() {
-		c.SetLastPixel(PointZero)
+	if c.currentPixel.Y() == c.Height() {
+		c.SetCurrentPixel(PixelZero())
 	}
 }
 
-// SetLastPixel sets the current pixel position.
-func (c *Canvas) SetLastPixel(p Point) {
-	c.lastPixel = p
+// SetCurrentPixel sets the current pixel position.
+func (c *Canvas) SetCurrentPixel(p Pixel) {
+	c.currentPixel = p
 }
 
-func (c *Canvas) GetLastPixel() *Point {
-	return &c.lastPixel
+func (c *Canvas) GetCurrentPixel() *Pixel {
+	return &c.currentPixel
 }
 
 // DrawNextPixel draws the next pixel in the current direction.
@@ -61,8 +61,8 @@ func (c *Canvas) DrawNextPixel(color color.Color) {
 // DrawPixel draws a pixel at the current position.
 func (c *Canvas) DrawPixel(color color.Color) {
 	c.DrawPixelAt(
-		c.lastPixel.X(),
-		c.lastPixel.Y(),
+		c.currentPixel.X(),
+		c.currentPixel.Y(),
 		color)
 }
 
