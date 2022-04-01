@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+const (
+	max_goroutines = 64
+)
+
 type FractalConfig interface {
 	IsStable(c, z complex128) (bool, uint)
 	MaxIterations() uint
@@ -26,7 +30,7 @@ func Fractal(canvas *Canvas, config FractalConfig) {
 
 	for y, _imag := range yRange {
 
-		for waitGroup.Length() >= 64 {
+		for waitGroup.Length() >= max_goroutines {
 			continue
 		}
 
