@@ -1,17 +1,43 @@
 package main
 
 import (
-	"image/color"
+	"fmt"
+	"time"
 
 	"github.com/slunimara/gofractal"
 )
 
 func main() {
-	canvas := gofractal.NewCanvas(25, 25)
+	fmt.Println("--- Mandelbrot Set ---")
 
-	canvas.DrawNextPixel(color.RGBAModel.Convert(color.RGBA{R: 255, G: 0, B: 0, A: 255}))
-	canvas.DrawNextPixel(color.RGBAModel.Convert(color.RGBA{R: 0, G: 255, B: 0, A: 255}))
-	canvas.DrawNextPixel(color.RGBAModel.Convert(color.RGBA{R: 0, G: 0, B: 255, A: 255}))
+	mandelbrot()
 
-	canvas.Save("testing.png")
+	fmt.Println("--- Done ---")
+}
+
+func mandelbrot() {
+	canvas := gofractal.NewCanvas(2500, 2000)
+
+	tStart := time.Now()
+	gofractal.Mandelbrot(canvas, 1000, 0.001)
+	tEnd := time.Now()
+
+	fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
+	canvas.Save("mandelbrot.png")
+}
+
+func performanceTesting() {
+	fmt.Println("--- Time testing")
+
+	// c := 528649457 + 38573538347i
+
+	// tStart := time.Now()
+	// cmplx.Abs(c)
+	// tEnd := time.Now()
+	// fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
+
+	// tStart = time.Now()
+	// gofractal.CAbs(c)
+	// tEnd = time.Now()
+	// fmt.Printf("Time: %v\n", tEnd.Sub(tStart))
 }

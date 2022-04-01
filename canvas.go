@@ -1,7 +1,6 @@
 package gofractal
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/fogleman/gg"
@@ -35,20 +34,22 @@ func (c *Canvas) NextPixel() {
 	c.lastPixel.AddX(1)
 
 	if c.lastPixel.X() == c.Width() {
-		c.lastPixel.SetX(1)
+		c.lastPixel.SetX(0)
 		c.lastPixel.AddY(1)
 	}
 
 	if c.lastPixel.Y() == c.Height() {
 		c.SetLastPixel(PointZero)
 	}
-
-	fmt.Println(c.lastPixel)
 }
 
 // SetLastPixel sets the current pixel position.
 func (c *Canvas) SetLastPixel(p Point) {
 	c.lastPixel = p
+}
+
+func (c *Canvas) GetLastPixel() *Point {
+	return &c.lastPixel
 }
 
 // DrawNextPixel draws the next pixel in the current direction.
