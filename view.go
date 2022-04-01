@@ -5,12 +5,15 @@ var (
 )
 
 type View struct {
-	bl, tr complex128
+	// Top right corner
+	tr complex128
+	// Bottom left corner
+	bl complex128
 }
 
-func NewView(tr, bl complex128) *View {
+func NewView(topRight, bottomLeft complex128) *View {
 	return &View{
-		tr: tr,
-		bl: bl,
+		tr: topRight,
+		bl: bottomLeft,
 	}
 }
