@@ -26,8 +26,9 @@ func (v View) BottomLeft() complex128 {
 	return v.bottomLeft
 }
 
-func (v View) viewRatio() (float64, float64) {
+func (v View) ViewRatio() (float64, float64) {
 	x, y := v.XDistance(), v.YDistance()
+
 	return x, y
 }
 

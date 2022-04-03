@@ -7,6 +7,10 @@ import (
 	"sync"
 )
 
+const (
+	debug = true
+)
+
 // TODO: Documenation
 func isStable(c complex128, z complex128, maxIterations uint) (bool, uint) {
 	i := uint(0)
@@ -21,16 +25,20 @@ func isStable(c complex128, z complex128, maxIterations uint) (bool, uint) {
 
 // TODO: Documenation
 func Mandelbrot(canvas *Canvas, view *View, maxIterations int) {
-	fmt.Print("orig wid: ", canvas.Width(), " orig hei: ", canvas.Height(), "\n")
+	if debug {
+		fmt.Println("orig wid: ", canvas.Width(), " orig hei: ", canvas.Height())
+	}
+
 	density := canvasDensity(canvas, view)
 
 	xRange := arange(real(view.bottomLeft), real(view.topRight), density)
 	yRange := arange(imag(view.topRight), imag(view.bottomLeft), density)
 
-	fmt.Print("density: ", density, "\n")
-	// fmt.Print("xRange: ", len(xRange), " yRange: ", len(yRange), "\n")
-	fmt.Print("bl: ", view.bottomLeft, " tr: ", view.topRight, "\n")
-	fmt.Print("wid: ", canvas.Width(), " hei: ", canvas.Height(), "\n")
+	if debug {
+		fmt.Println("\ndensity: ", density)
+		fmt.Println("bl: ", view.bottomLeft, " tr: ", view.topRight)
+		fmt.Println("wid: ", canvas.Width(), " hei: ", canvas.Height())
+	}
 
 	var mutex sync.Mutex
 	waitGroup := NewWaitGroup()
@@ -90,66 +98,82 @@ func arange(start, stop, step float64) []float64 {
 	return arr
 }
 
+// TODO: Documenation
 func canvasDensity(canvas *Canvas, view *View) float64 {
-	width, height := canvas.Width(), canvas.Height()
-	keepResolution := true
+	keepRes := true
 
-	if keepResolution {
-		tr, bl := view.topRight, view.bottomLeft
-		w, h := canvas.resolutionRatio()
-		x, y := view.viewRatio()
-
-		if x >= y {
-			newRatioY := CrossMultiplication(float64(w), float64(h), x)
-			ratioDifference := newRatioY - y
-			sideExtension := (ratioDifference / 2) * y
-			tr += complex(0, sideExtension)
-			bl -= complex(0, sideExtension)
-
-			fmt.Print("x: ", x, " y: ", y, " w: ", w, " h: ", h, "\n")
-			fmt.Print("newRatioY: ", newRatioY, "\n")
-			fmt.Print("difference: ", ratioDifference, "\n")
-			fmt.Print("sideExtension: ", sideExtension, "\n\n")
-
-			*view = *NewView(tr, bl)
-			density := view.XDistance() / float64(width)
-
-			return density
-		} else {
-			newRatioX := CrossMultiplication(float64(h), float64(w), y)
-			ratioDifference := newRatioX - x
-			sideExtension := (ratioDifference / 2) * x
-			tr += complex(sideExtension, 0)
-			bl -= complex(sideExtension, 0)
-
-			fmt.Print("x: ", x, " y: ", y, " w: ", w, " h: ", h, "\n")
-			fmt.Print("newRatioY: ", newRatioX, "\n")
-			fmt.Print("difference: ", ratioDifference, "\n")
-			fmt.Print("sideExtension: ", sideExtension, "\n\n")
-
-			*view = *NewView(tr, bl)
-			density := view.YDistance() / float64(height)
-
-			return density
-		}
+	if keepRes {
+		return keepResolution(canvas, view)
 	} else {
-		if width >= height {
-			density := view.XDistance() / float64(width)
-			y1, y2 := imag(view.topRight), imag(view.bottomLeft)
-			height := uint64(IntervalDistribution(y1, y2, density))
+		return keepView(canvas, view)
+	}
+}
 
-			*canvas = *NewCanvas(width, height)
+// TODO: Documenation
+func keepResolution(canvas *Canvas, view *View) float64 {
+	tr, bl := view.topRight, view.bottomLeft
+	w, h := canvas.ResolutionRatio()
+	x, y := view.ViewRatio()
 
-			return density
-		} else {
-			density := view.YDistance() / float64(height)
-			x1, x2 := real(view.topRight), real(view.bottomLeft)
-			width := uint64(IntervalDistribution(x1, x2, density))
+	if x >= y {
+		newRatioY := CrossMultiplication(float64(w), float64(h), x)
+		ratioDifference := newRatioY - y
+		sideExtension := (ratioDifference / 2) * y
+		tr += complex(0, sideExtension)
+		bl -= complex(0, sideExtension)
 
-			*canvas = *NewCanvas(width, height)
-
-			return density
+		if debug {
+			fmt.Println("x: ", x, " y: ", y, " w: ", w, " h: ", h)
+			fmt.Println("newRatioY: ", newRatioY)
+			fmt.Println("difference: ", ratioDifference)
+			fmt.Println("sideExtension: ", sideExtension)
 		}
+
+		*view = *NewView(tr, bl)
+		density := view.XDistance() / float64(canvas.Width())
+
+		return density
+	} else {
+		newRatioX := CrossMultiplication(float64(h), float64(w), y)
+		ratioDifference := newRatioX - x
+		sideExtension := (ratioDifference / 2) * x
+		tr += complex(sideExtension, 0)
+		bl -= complex(sideExtension, 0)
+
+		if debug {
+			fmt.Println("x: ", x, " y: ", y, " w: ", w, " h: ", h)
+			fmt.Println("newRatioY: ", newRatioX)
+			fmt.Println("difference: ", ratioDifference)
+			fmt.Println("sideExtension: ", sideExtension)
+		}
+
+		*view = *NewView(tr, bl)
+		density := view.YDistance() / float64(canvas.Height())
+
+		return density
+	}
+}
+
+// TODO: Documenation
+func keepView(canvas *Canvas, view *View) float64 {
+	width, height := canvas.Width(), canvas.Height()
+
+	if width >= height {
+		density := view.XDistance() / float64(width)
+		y1, y2 := imag(view.topRight), imag(view.bottomLeft)
+		height := uint64(IntervalDistribution(y1, y2, density))
+
+		*canvas = *NewCanvas(width, height)
+
+		return density
+	} else {
+		density := view.YDistance() / float64(height)
+		x1, x2 := real(view.topRight), real(view.bottomLeft)
+		width := uint64(IntervalDistribution(x1, x2, density))
+
+		*canvas = *NewCanvas(width, height)
+
+		return density
 	}
 }
 
@@ -169,5 +193,6 @@ func GCD(a, b uint64) uint64 {
 		b = a % b
 		a = t
 	}
+
 	return a
 }
