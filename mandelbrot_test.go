@@ -4,13 +4,19 @@ import "testing"
 
 func TestMandelbrot(t *testing.T) {
 	canvas := NewCanvas(250, 200)
-	mandel := NewMandelbrot(10, 0.01)
+	view := NewView(
+		complex(0.5, 1),
+		complex(-2, -1))
+	mandel := NewMandelbrot(10, *view)
 
 	mandel.Draw(canvas)
 }
 
 func TestMandelbrotIsStable(t *testing.T) {
-	mandel := NewMandelbrot(10, 0.01)
+	view := NewView(
+		complex(0.5, 1),
+		complex(-2, -1))
+	mandel := NewMandelbrot(10, *view)
 
 	tables := []struct {
 		c complex128
