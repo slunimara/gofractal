@@ -8,77 +8,88 @@ import (
 )
 
 const (
-	debug = true
+	max_goroutines = 64
+	debug          = true
 )
 
-// TODO: Documenation
-func isStable(c complex128, z complex128, maxIterations uint) (bool, uint) {
-	i := uint(0)
-
-	for i <= maxIterations && complexAbs(z) <= 2 {
-		z = complexPow2(z) + c
-		i += 1
-	}
-
-	return complexAbs(z) <= 2, i
+type FractalConfig interface {
+	IsStable(c, z complex128) (bool, uint)
+	MaxIterations() uint
+	Draw(canvas *Canvas)
+	View() *View
 }
 
 // TODO: Documenation
-func Mandelbrot(canvas *Canvas, view *View, maxIterations int) {
+func Fractal(canvas *Canvas, config FractalConfig) {
 	if debug {
 		fmt.Println("orig wid: ", canvas.Width(), " orig hei: ", canvas.Height())
 	}
 
-	density := canvasDensity(canvas, view)
+	var (
+		mutex     sync.Mutex
+		waitGroup = NewWaitGroup()
 
-	xRange := arange(real(view.bottomLeft), real(view.topRight), density)
-	yRange := arange(imag(view.topRight), imag(view.bottomLeft), density)
+		bottomLeft = config.View().bottomLeft
+		topRight   = config.View().topRight
+
+		density = canvasDensity(canvas, config.View())
+
+		xRange = arange(real(bottomLeft), real(topRight), density)
+		yRange = arange(imag(topRight), imag(bottomLeft), density)
+	)
 
 	if debug {
-		fmt.Println("\ndensity: ", density)
-		fmt.Println("bl: ", view.bottomLeft, " tr: ", view.topRight)
+		fmt.Println("density: ", density)
+		fmt.Println("bl: ", bottomLeft, " tr: ", topRight)
 		fmt.Println("wid: ", canvas.Width(), " hei: ", canvas.Height())
 	}
 
-	var mutex sync.Mutex
-	waitGroup := NewWaitGroup()
+	for y, _imag := range yRange {
 
-	for y, im := range yRange {
-
-		for waitGroup.Length() >= 64 {
+		for waitGroup.Length() >= max_goroutines {
 			continue
 		}
 
 		waitGroup.Add(1)
 
-		go func(y int, im float64) {
-			defer waitGroup.Done()
-
-			stableArray := make([]bool, len(xRange))
-
-			for x, re := range xRange {
-				c := complex(re, im)
-				stable, _ := isStable(c, complex(0, 0), uint(maxIterations))
-				//stable, _ := isStable(0.25+0i, c, uint(maxIterations))
-				stableArray[x] = stable
-			}
-
-			mutex.Lock()
-			for x, stable := range stableArray {
-
-				if stable {
-					canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
-				} else {
-					canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
-				}
-
-			}
-			mutex.Unlock()
-
-		}(y, im)
+		go fractalLineComputation(waitGroup, xRange, _imag, config, &mutex, canvas, y)
 	}
 
 	waitGroup.Wait()
+}
+
+func fractalLineComputation(
+	waitGroup *WaitGroup,
+	xRange []float64,
+	_imag float64,
+	config FractalConfig,
+	mutex *sync.Mutex,
+	canvas *Canvas,
+	y int,
+) {
+	defer waitGroup.Done()
+
+	stableArray := make([]bool, len(xRange))
+
+	for x, _real := range xRange {
+		c := complex(_real, _imag)
+
+		stable, _ := config.IsStable(c, complex(0, 0))
+
+		stableArray[x] = stable
+	}
+
+	mutex.Lock()
+	for x, stable := range stableArray {
+
+		if stable {
+			canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
+		} else {
+			canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
+		}
+
+	}
+	mutex.Unlock()
 }
 
 // TODO: Documenation
@@ -111,6 +122,7 @@ func canvasDensity(canvas *Canvas, view *View) float64 {
 
 // TODO: Documenation
 func keepResolution(canvas *Canvas, view *View) float64 {
+	var density float64
 	tr, bl := view.topRight, view.bottomLeft
 	w, h := canvas.ResolutionRatio()
 	x, y := view.ViewRatio()
@@ -130,9 +142,7 @@ func keepResolution(canvas *Canvas, view *View) float64 {
 		}
 
 		*view = *NewView(tr, bl)
-		density := view.XDistance() / float64(canvas.Width())
-
-		return density
+		density = view.XDistance() / float64(canvas.Width())
 	} else {
 		newRatioX := CrossMultiplication(float64(h), float64(w), y)
 		ratioDifference := newRatioX - x
@@ -148,10 +158,10 @@ func keepResolution(canvas *Canvas, view *View) float64 {
 		}
 
 		*view = *NewView(tr, bl)
-		density := view.YDistance() / float64(canvas.Height())
-
-		return density
+		density = view.YDistance() / float64(canvas.Height())
 	}
+
+	return density
 }
 
 // TODO: Documenation
@@ -183,10 +193,12 @@ func CrossMultiplication(a, b, c float64) float64 {
 	return b * c / a
 }
 
+// TODO: Documenation
 func IntervalDistribution(start, stop, step float64) float64 {
 	return math.Ceil((math.Abs(stop - start)) / step)
 }
 
+// TODO: Documenation
 func GCD(a, b uint64) uint64 {
 	for b != 0 {
 		t := b
