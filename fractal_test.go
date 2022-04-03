@@ -55,5 +55,9 @@ func TestArange(t *testing.T) {
 func TestMandelbrot(t *testing.T) {
 	canvas := NewCanvas(250, 200)
 
-	Mandelbrot(canvas, 10, 0.01)
+	view := NewView(
+		complex(0.5, 1),
+		complex(-2, -1))
+
+	Mandelbrot(canvas, view, 10)
 }
