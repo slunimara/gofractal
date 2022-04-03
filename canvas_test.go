@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TODO: Write better test
 func TestNextPixel(t *testing.T) {
 }
 
