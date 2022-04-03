@@ -3,7 +3,6 @@ package gofractal
 import (
 	"fmt"
 	"image/color"
-	"math"
 	"sync"
 )
 
@@ -95,23 +94,6 @@ func fractalLineComputation(
 }
 
 // TODO: Documenation
-// Neefektivní! Step musí být > 0 !!
-func arange(start, stop, step float64) []float64 {
-	N := int(IntervalDistribution(start, stop, step))
-	arr := make([]float64, N)
-
-	if start > stop {
-		step *= -1
-	}
-
-	for i := range arr {
-		arr[i] = start + (float64(i) * step)
-	}
-
-	return arr
-}
-
-// TODO: Documenation
 func canvasDensity(canvas *Canvas, view *View) float64 {
 	keepRes := true
 
@@ -193,13 +175,3 @@ func keepView(canvas *Canvas, view *View) float64 {
 	return density
 }
 
-// Determine the value of a variable.
-// a : b = c : return
-func CrossMultiplication(a, b, c float64) float64 {
-	return b * c / a
-}
-
-// TODO: Documenation
-func IntervalDistribution(start, stop, step float64) float64 {
-	return math.Ceil((math.Abs(stop - start)) / step)
-}
