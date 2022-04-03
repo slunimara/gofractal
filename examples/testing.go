@@ -16,8 +16,11 @@ func main() {
 }
 
 func mandelbrot() {
-	canvas := gofractal.NewCanvas(2500, 2000)
-	mandelbrot := gofractal.NewMandelbrot(1000, 0.001)
+	var (
+		canvas     = gofractal.NewCanvas(2500, 2000)
+		view       = gofractal.NewView(complex(0.5, 1), complex(-2, -1))
+		mandelbrot = gofractal.NewMandelbrot(1000, *view)
+	)
 
 	tStart := time.Now()
 	mandelbrot.Draw(canvas)

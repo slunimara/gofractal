@@ -2,14 +2,14 @@ package gofractal
 
 type mandelbrot struct {
 	maxIterations uint
-	density       float64
+	view          View
 }
 
 // TODO: Documenation
-func NewMandelbrot(maxIterations uint, density float64) *mandelbrot {
+func NewMandelbrot(maxIterations uint, view View) *mandelbrot {
 	return &mandelbrot{
 		maxIterations: maxIterations,
-		density:       density,
+		view:          view,
 	}
 }
 
@@ -19,8 +19,8 @@ func (m mandelbrot) MaxIterations() uint {
 }
 
 // TODO: Documenation
-func (m mandelbrot) Density() float64 {
-	return m.density
+func (m mandelbrot) View() *View {
+	return &m.view
 }
 
 // TODO: Documenation
