@@ -30,10 +30,9 @@ func (c Canvas) Height() uint64 {
 }
 
 func (c Canvas) ResolutionRatio() (uint64, uint64) {
-	heigth, width := c.Height(), c.Width()
-	d := GCD(heigth, width)
+	d := GCD(c.Height(), c.Width())
 
-	return uint64(width / d), uint64(heigth / d)
+	return uint64(c.Width() / d), uint64(c.Height() / d)
 }
 
 // NextPixel increments the current pixel position.

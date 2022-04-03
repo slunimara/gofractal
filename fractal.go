@@ -58,6 +58,7 @@ func Fractal(canvas *Canvas, config FractalConfig) {
 	waitGroup.Wait()
 }
 
+// TODO: Documenation
 func fractalLineComputation(
 	waitGroup *WaitGroup,
 	xRange []float64,
@@ -74,22 +75,23 @@ func fractalLineComputation(
 	for x, _real := range xRange {
 		c := complex(_real, _imag)
 
-		stable, _ := config.IsStable(c, complex(0, 0))
-
-		stableArray[x] = stable
+		stableArray[x], _ = config.IsStable(c, complex(0, 0))
 	}
 
 	mutex.Lock()
-	for x, stable := range stableArray {
+	defer mutex.Unlock()
 
-		if stable {
-			canvas.DrawPixelAt(uint64(x), uint64(y), color.Black)
+	for x, isStable := range stableArray {
+
+		x := uint64(x)
+		y := uint64(y)
+
+		if isStable {
+			canvas.DrawPixelAt(x, y, color.Black)
 		} else {
-			canvas.DrawPixelAt(uint64(x), uint64(y), color.White)
+			canvas.DrawPixelAt(x, y, color.White)
 		}
-
 	}
-	mutex.Unlock()
 }
 
 // TODO: Documenation
@@ -122,8 +124,9 @@ func canvasDensity(canvas *Canvas, view *View) float64 {
 
 // TODO: Documenation
 func keepResolution(canvas *Canvas, view *View) float64 {
-	var density float64
-	tr, bl := view.topRight, view.bottomLeft
+	topRight := view.topRight
+	bottomLeft := view.bottomLeft
+
 	w, h := canvas.ResolutionRatio()
 	x, y := view.ViewRatio()
 
@@ -131,8 +134,9 @@ func keepResolution(canvas *Canvas, view *View) float64 {
 		newRatioY := CrossMultiplication(float64(w), float64(h), x)
 		ratioDifference := newRatioY - y
 		sideExtension := (ratioDifference / 2) * y
-		tr += complex(0, sideExtension)
-		bl -= complex(0, sideExtension)
+
+		topRight += complex(0, sideExtension)
+		bottomLeft -= complex(0, sideExtension)
 
 		if debug {
 			fmt.Println("x: ", x, " y: ", y, " w: ", w, " h: ", h)
@@ -141,50 +145,52 @@ func keepResolution(canvas *Canvas, view *View) float64 {
 			fmt.Println("sideExtension: ", sideExtension)
 		}
 
-		*view = *NewView(tr, bl)
-		density = view.XDistance() / float64(canvas.Width())
-	} else {
-		newRatioX := CrossMultiplication(float64(h), float64(w), y)
-		ratioDifference := newRatioX - x
-		sideExtension := (ratioDifference / 2) * x
-		tr += complex(sideExtension, 0)
-		bl -= complex(sideExtension, 0)
-
-		if debug {
-			fmt.Println("x: ", x, " y: ", y, " w: ", w, " h: ", h)
-			fmt.Println("newRatioY: ", newRatioX)
-			fmt.Println("difference: ", ratioDifference)
-			fmt.Println("sideExtension: ", sideExtension)
-		}
-
-		*view = *NewView(tr, bl)
-		density = view.YDistance() / float64(canvas.Height())
+		*view = *NewView(topRight, bottomLeft)
+		return view.XDistance() / float64(canvas.Width())
 	}
 
-	return density
+	newRatioX := CrossMultiplication(float64(h), float64(w), y)
+	ratioDifference := newRatioX - x
+	sideExtension := (ratioDifference / 2) * x
+
+	topRight += complex(sideExtension, 0)
+	bottomLeft -= complex(sideExtension, 0)
+
+	if debug {
+		fmt.Println("x: ", x, " y: ", y, " w: ", w, " h: ", h)
+		fmt.Println("newRatioY: ", newRatioX)
+		fmt.Println("difference: ", ratioDifference)
+		fmt.Println("sideExtension: ", sideExtension)
+	}
+
+	*view = *NewView(topRight, bottomLeft)
+	return view.YDistance() / float64(canvas.Height())
 }
 
 // TODO: Documenation
 func keepView(canvas *Canvas, view *View) float64 {
-	width, height := canvas.Width(), canvas.Height()
+	width := canvas.Width()
+	height := canvas.Height()
 
 	if width >= height {
 		density := view.XDistance() / float64(width)
-		y1, y2 := imag(view.topRight), imag(view.bottomLeft)
+		y1 := imag(view.topRight)
+		y2 := imag(view.bottomLeft)
 		height := uint64(IntervalDistribution(y1, y2, density))
 
 		*canvas = *NewCanvas(width, height)
 
 		return density
-	} else {
-		density := view.YDistance() / float64(height)
-		x1, x2 := real(view.topRight), real(view.bottomLeft)
-		width := uint64(IntervalDistribution(x1, x2, density))
-
-		*canvas = *NewCanvas(width, height)
-
-		return density
 	}
+
+	density := view.YDistance() / float64(height)
+	x1 := real(view.topRight)
+	x2 := real(view.bottomLeft)
+	width = uint64(IntervalDistribution(x1, x2, density))
+
+	*canvas = *NewCanvas(width, height)
+
+	return density
 }
 
 // Determine the value of a variable.
@@ -196,15 +202,4 @@ func CrossMultiplication(a, b, c float64) float64 {
 // TODO: Documenation
 func IntervalDistribution(start, stop, step float64) float64 {
 	return math.Ceil((math.Abs(stop - start)) / step)
-}
-
-// TODO: Documenation
-func GCD(a, b uint64) uint64 {
-	for b != 0 {
-		t := b
-		b = a % b
-		a = t
-	}
-
-	return a
 }
